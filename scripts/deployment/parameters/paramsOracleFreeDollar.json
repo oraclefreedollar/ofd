@@ -1,0 +1,20 @@
+[
+    {
+        "name": "OracleFreeDollar",
+        "chainId": 31337,
+        "chainName" : "Local",
+        "minApplicationPeriod" : 900
+    },
+    {
+        "name": "OracleFreeDollar",
+        "chainId": 421614,
+        "chainName" : "Sepolia",
+        "minApplicationPeriod" : 900
+    },
+    {
+        "name": "OracleFreeDollar",
+        "chainId": 1,
+        "chainName" : "Ethereum",
+        "minApplicationPeriod" : 1209600
+    }
+]
