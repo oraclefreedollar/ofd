@@ -20,7 +20,7 @@ contract Position is Ownable, IPosition, MathUtil {
      */
 
     /**
-     * @notice The zofd price per unit of the collateral below which challenges succeed, (36 - collateral.decimals) decimals
+     * @notice The ofd price per unit of the collateral below which challenges succeed, (36 - collateral.decimals) decimals
      */
     uint256 public price;
 
@@ -74,7 +74,7 @@ contract Position is Ownable, IPosition, MathUtil {
     /**
      * @notice The OracleFreeDollar contract.
      */
-    IOracleFreeDollar public immutable zofd;
+    IOracleFreeDollar public immutable ofd;
 
     /**
      * @notice The collateral token.
@@ -141,7 +141,7 @@ contract Position is Ownable, IPosition, MathUtil {
     constructor(
         address _owner,
         address _hub,
-        address _zofd,
+        address _ofd,
         address _collateral,
         uint256 _minCollateral,
         uint256 _initialLimit,
@@ -156,7 +156,7 @@ contract Position is Ownable, IPosition, MathUtil {
         _setOwner(_owner);
         original = address(this);
         hub = _hub;
-        zofd = IOracleFreeDollar(_zofd);
+        ofd = IOracleFreeDollar(_ofd);
         collateral = IERC20(_collateral);
         annualInterestPPM = _annualInterestPPM;
         reserveContribution = _reservePPM;
@@ -217,7 +217,7 @@ contract Position is Ownable, IPosition, MathUtil {
      */
     function deny(address[] calldata helpers, string calldata message) external {
         if (block.timestamp >= start) revert TooLate();
-        IReserve(zofd.reserve()).checkQualified(msg.sender, helpers);
+        IReserve(ofd.reserve()).checkQualified(msg.sender, helpers);
         _close(); // since expiration is immutable, we put it under eternal cooldown
         emit PositionDenied(msg.sender, message);
     }
@@ -231,7 +231,7 @@ contract Position is Ownable, IPosition, MathUtil {
     }
 
     /**
-     * @notice This is how much the minter can actually use when minting ZOFD, with the rest being used
+     * @notice This is how much the minter can actually use when minting OFD, with the rest being used
      * assigned to the minter reserve or (if applicable) fees.
      */
     function getUsableMint(uint256 totalMint, bool afterFees) external view returns (uint256) {
@@ -243,7 +243,7 @@ contract Position is Ownable, IPosition, MathUtil {
     }
 
     /**
-     * @notice "All in one" function to adjust the outstanding amount of ZOFD, the collateral amount,
+     * @notice "All in one" function to adjust the outstanding amount of OFD, the collateral amount,
      * and the price in one transaction.
      */
     function adjust(uint256 newMinted, uint256 newCollateral, uint256 newPrice) external onlyOwner {
@@ -253,7 +253,7 @@ contract Position is Ownable, IPosition, MathUtil {
         }
         // Must be called after collateral deposit, but before withdrawal
         if (newMinted < minted) {
-            zofd.burnFromWithReserve(msg.sender, minted - newMinted, reserveContribution);
+            ofd.burnFromWithReserve(msg.sender, minted - newMinted, reserveContribution);
             minted = newMinted;
         }
         if (newCollateral < colbal) {
@@ -293,7 +293,7 @@ contract Position is Ownable, IPosition, MathUtil {
     }
 
     /**
-     * @notice Mint ZOFD as long as there is no open challenge, the position is not subject to a cooldown,
+     * @notice Mint OFD as long as there is no open challenge, the position is not subject to a cooldown,
      * and there is sufficient collateral.
      */
     function mint(address target, uint256 amount) public onlyOwner noChallenge noCooldown alive {
@@ -310,7 +310,7 @@ contract Position is Ownable, IPosition, MathUtil {
 
     function _mint(address target, uint256 amount, uint256 collateral_) internal {
         if (minted + amount > limit) revert LimitExceeded();
-        zofd.mintWithReserve(target, amount, reserveContribution, calculateCurrentFee());
+        ofd.mintWithReserve(target, amount, reserveContribution, calculateCurrentFee());
         minted += amount;
 
         _checkCollateral(collateral_, price);
@@ -325,12 +325,12 @@ contract Position is Ownable, IPosition, MathUtil {
     }
 
     /**
-     * @notice Repay some ZOFD. If too much is repaid, the call fails.
+     * @notice Repay some OFD. If too much is repaid, the call fails.
      * It is possible to repay while there are challenges, but the collateral is locked until all is clear again.
      *
      * The repaid amount should fulfill the following equation in order to close the position,
      * i.e. bring the minted amount to 0:
-     * minted = amount + zofd.calculateAssignedReserve(amount, reservePPM)
+     * minted = amount + ofd.calculateAssignedReserve(amount, reservePPM)
      *
      * Under normal circumstances, this implies:
      * amount = minted * (1000000 - reservePPM)
@@ -338,8 +338,8 @@ contract Position is Ownable, IPosition, MathUtil {
      * E.g. if minted is 50 and reservePPM is 200000, it is necessary to repay 40 to be able to close the position.
      */
     function repay(uint256 amount) public {
-        IERC20(zofd).transferFrom(msg.sender, address(this), amount);
-        uint256 actuallyRepaid = IOracleFreeDollar(zofd).burnWithReserve(amount, reserveContribution);
+        IERC20(ofd).transferFrom(msg.sender, address(this), amount);
+        uint256 actuallyRepaid = IOracleFreeDollar(ofd).burnWithReserve(amount, reserveContribution);
         _notifyRepaid(actuallyRepaid);
         emit MintingUpdate(_collateralBalance(), price, minted, limit);
     }
@@ -443,7 +443,7 @@ contract Position is Ownable, IPosition, MathUtil {
      *
      * @param _bidder   address of the bidder that receives the collateral
      * @param _size     amount of the collateral bid for
-     * @return (position owner, effective challenge size in ZOFD, amount to be repaid, reserve ppm)
+     * @return (position owner, effective challenge size in OFD, amount to be repaid, reserve ppm)
      */
     function notifyChallengeSucceeded(
         address _bidder,

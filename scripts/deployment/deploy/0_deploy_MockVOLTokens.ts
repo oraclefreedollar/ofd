@@ -10,7 +10,6 @@ import { deployContract } from "../deployUtils";
 const deployMockTokens: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment
 ) {
-    console.log("------ Deploying Mock Tokens ------");
   const paramFile = "paramsPositions.json";
 
   let chainId = hre.network.config["chainId"];

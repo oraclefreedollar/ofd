@@ -89,8 +89,8 @@ contract Equity is ERC20PermitLight, MathUtil, IReserve {
     event Delegation(address indexed from, address indexed to); // indicates a delegation
     event Trade(address who, int amount, uint totPrice, uint newprice); // amount pos or neg for mint or redemption
 
-    constructor(OracleFreeDollar zofd_) ERC20(18) {
-        ofd = zofd_;
+    constructor(OracleFreeDollar ofd_) ERC20(18) {
+        ofd = ofd_;
     }
 
     function name() external pure override returns (string memory) {

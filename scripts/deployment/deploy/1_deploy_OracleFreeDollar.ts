@@ -7,14 +7,13 @@ import { deployContract } from "../deployUtils";
     export PK=12...
     // deploy according to config (see package.json), e.g.,
     npm run redeploynotesttoken:network sepolia
-    // mint ZOFD via scripts/maintenance/mintOFD.ts (adjust StableCoinBridge address in mintOFD.ts header)
+    // mint OFD via scripts/maintenance/mintOFD.ts (adjust StableCoinBridge address in mintOFD.ts header)
     ts-node scripts/maintenance/mintOFD.ts
-    // verify on https://sepolia.etherscan.io/
+    // verify on https://sepolia.arbiscan.io/
     // deploy positions (inspect script A_deploy_...)
     npm run-script deployPositions:network sepolia
 */
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-    console.log("------ Deploying OracleFreeDollar ------");
   const paramFile = "paramsOracleFreeDollar.json";
   let chainId = hre.network.config["chainId"];
   let paramsArr = require(__dirname + `/../parameters/${paramFile}`);
@@ -29,14 +28,14 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   let minApplicationPeriod = params["minApplicationPeriod"];
   console.log("\nMin application period =", minApplicationPeriod);
 
-  let FC = await deployContract(hre, "OracleFreeDollar", [minApplicationPeriod]);
+  let OFD = await deployContract(hre, "OracleFreeDollar", [minApplicationPeriod]);
   console.log(
-    `Verify OracleFreeDollar:\nnpx hardhat verify --network sepolia ${await FC.getAddress()} ${minApplicationPeriod}`
+    `Verify OracleFreeDollar:\nnpx hardhat verify --network sepolia ${await OFD.getAddress()} ${minApplicationPeriod}`
   );
 
-  let reserve = await FC.reserve();
+  let reserve = await OFD.reserve();
   console.log(
-    `Verify Equity:\nnpx hardhat verify --network sepolia ${reserve} ${await FC.getAddress()}\n`
+    `Verify Equity:\nnpx hardhat verify --network sepolia ${reserve} ${await OFD.getAddress()}\n`
   );
 };
 export default deploy;

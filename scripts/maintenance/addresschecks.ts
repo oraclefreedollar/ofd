@@ -22,14 +22,14 @@ let mintingHubAddr = "0x5F8a6244ca00466a38b6d2891685bBB6400e7f5a";
 async function run() {
     //const wallet = new ethers.Wallet(pk);
     let mintingHubContract = await getSigningManagerFromPK(mintingHubAddr, MH_ABI, NODE_URL, pk);
-    let zofdAddr = await mintingHubContract.zofd();
-    let zofdContract = await getSigningManagerFromPK(zofdAddr, OFD_ABI, NODE_URL, pk);
+    let ofdAddr = await mintingHubContract.ofd();
+    let ofdContract = await getSigningManagerFromPK(ofdAddr, OFD_ABI, NODE_URL, pk);
     console.log("Minting Hub     : \t", mintingHubAddr);
-    console.log("OracleFreeDollar ZOFD: \t", zofdAddr);
-    let reserve = await zofdContract.reserve();
+    console.log("OracleFreeDollar OFD: \t", ofdAddr);
+    let reserve = await ofdContract.reserve();
     console.log("Reserve (=Equity): \t", reserve);
 
-    //console.log(`Verify Equity:\nnpx hardhat verify --network sepolia ${reserve} ${zofdContract.address}`)
+    //console.log(`Verify Equity:\nnpx hardhat verify --network sepolia ${reserve} ${ofdContract.address}`)
 }
 
 run();

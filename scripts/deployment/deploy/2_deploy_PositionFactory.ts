@@ -3,7 +3,6 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { deployContract } from "../deployUtils";
 
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-    console.log("------ Deploying Position Factory ------");
   const {
     deployments: { get },
   } = hre;

@@ -12,7 +12,7 @@ describe("Equity Tests", () => {
 
   let equity: Equity;
   let bridge: StablecoinBridge;
-  let zofd: OracleFreeDollar;
+  let ofd: OracleFreeDollar;
   let xofd: TestToken;
 
   before(async () => {
@@ -24,27 +24,27 @@ describe("Equity Tests", () => {
 
   beforeEach(async () => {
     const oracleFreeDollarFactoryFactory = await ethers.getContractFactory("OracleFreeDollar");
-    zofd = await oracleFreeDollarFactoryFactory.deploy(10 * 86400);
+    ofd = await oracleFreeDollarFactoryFactory.deploy(10 * 86400);
 
     let supply = floatToDec18(1000_000);
     const bridgeFactory = await ethers.getContractFactory("StablecoinBridge");
     bridge = await bridgeFactory.deploy(
       await xofd.getAddress(),
-      await zofd.getAddress(),
+      await ofd.getAddress(),
       floatToDec18(100_000_000_000)
     );
-    await zofd.initialize(await bridge.getAddress(), "");
+    await ofd.initialize(await bridge.getAddress(), "");
 
     await xofd.mint(owner.address, supply);
     await xofd.approve(await bridge.getAddress(), supply);
     await bridge.mint(supply);
-    await zofd.transfer(bob.address, floatToDec18(5000));
-    equity = await ethers.getContractAt("Equity", await zofd.reserve());
+    await ofd.transfer(bob.address, floatToDec18(5000));
+    equity = await ethers.getContractAt("Equity", await ofd.reserve());
   });
 
   describe("basic initialization", () => {
     it("should have symbol OFD", async () => {
-      let symbol = await zofd.symbol();
+      let symbol = await ofd.symbol();
       expect(symbol).to.be.equal("OFD");
     });
     it("should have symbol OFDPS", async () => {
@@ -55,12 +55,12 @@ describe("Equity Tests", () => {
       let name = await equity.name();
       expect(name).to.be.equal("OracleFreeDollar Pool Share");
     });
-    it("should have inital price 1 ZOFD / OFDPS", async () => {
+    it("should have inital price 1 OFD / OFDPS", async () => {
       let price = await equity.price();
       expect(price).to.be.equal(BigInt(1e18));
     });
     it("should have some coins", async () => {
-      let balance = await zofd.balanceOf(owner.address);
+      let balance = await ofd.balanceOf(owner.address);
       expect(balance).to.be.equal(floatToDec18(1000_000 - 5000));
     });
   });
@@ -89,7 +89,7 @@ describe("Equity Tests", () => {
     // });
     it("should create an initial share", async () => {
       const expected = await equity.calculateShares(floatToDec18(1000));
-      await zofd.transfer(await equity.getAddress(), 1);
+      await ofd.transfer(await equity.getAddress(), 1);
       const price = await equity.price();
       expect(price).to.be.equal(floatToDec18(1));
       await equity.calculateShares(floatToDec18(1000));
@@ -136,7 +136,7 @@ describe("Equity Tests", () => {
 
       const redemptionAmount =
         (await equity.balanceOf(owner.address)) - floatToDec18(1000.0);
-      const equityCapital = await zofd.balanceOf(await equity.getAddress());
+      const equityCapital = await ofd.balanceOf(await equity.getAddress());
       const proceeds = await equity.calculateProceeds(redemptionAmount);
       expect(proceeds).to.be.approximately(
         (equityCapital * 7n) / 8n,
@@ -155,11 +155,11 @@ describe("Equity Tests", () => {
         equity.redeemExpected(owner.address, redemptionAmount, proceeds * 2n)
       ).to.be.revertedWithoutReason();
 
-      const beforeBal = await zofd.balanceOf(alice.address);
+      const beforeBal = await ofd.balanceOf(alice.address);
       await expect(
         equity.redeemExpected(alice.address, redemptionAmount, proceeds)
       ).to.be.emit(equity, "Trade");
-      const afterBal = await zofd.balanceOf(alice.address);
+      const afterBal = await ofd.balanceOf(alice.address);
       expect(afterBal - beforeBal).to.be.equal(proceeds);
     });
     it("should be able to redeem allowed shares for share holder", async () => {
@@ -170,7 +170,7 @@ describe("Equity Tests", () => {
       await equity.approve(alice.address, redemptionAmount);
 
       const proceeds = await equity.calculateProceeds(redemptionAmount);
-      const beforeBal = await zofd.balanceOf(bob.address);
+      const beforeBal = await ofd.balanceOf(bob.address);
       await expect(
         equity
           .connect(alice)
@@ -184,7 +184,7 @@ describe("Equity Tests", () => {
       await equity
         .connect(alice)
         .redeemFrom(owner.address, bob.address, redemptionAmount, proceeds);
-      const afterBal = await zofd.balanceOf(bob.address);
+      const afterBal = await ofd.balanceOf(bob.address);
       expect(afterBal - beforeBal).to.be.equal(proceeds);
     });
   });
@@ -314,7 +314,7 @@ describe("Equity Tests", () => {
       ).to.be.revertedWithoutReason();
     });
     it("should revert qualified check when not meet quorum", async () => {
-      await zofd.transfer(alice.address, 1);
+      await ofd.transfer(alice.address, 1);
       await equity.connect(alice).invest(1, 0);
       await expect(
         equity.checkQualified(alice.address, [])
@@ -323,13 +323,13 @@ describe("Equity Tests", () => {
   });
   describe("restructure cap table", () => {
     it("should revert restructure when have enough equity", async () => {
-      await zofd.transfer(await equity.getAddress(), floatToDec18(1000));
+      await ofd.transfer(await equity.getAddress(), floatToDec18(1000));
       await expect(
         equity.restructureCapTable([], [])
       ).to.be.revertedWithoutReason();
     });
     it("should burn equity balances of given users", async () => {
-      await zofd.transfer(await equity.getAddress(), floatToDec18(100));
+      await ofd.transfer(await equity.getAddress(), floatToDec18(100));
       await equity.restructureCapTable([], [alice.address, bob.address]);
     });
   });

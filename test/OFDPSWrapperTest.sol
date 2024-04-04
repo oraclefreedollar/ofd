@@ -13,7 +13,7 @@ import "../contracts/utils/OFDPSWrapper.sol";
 
 contract OFDPSWrapperTest is Test {
 
-    OracleFreeDollar zofd;
+    OracleFreeDollar ofd;
     Equity ofdps;
     StablecoinBridge swap;
     TestToken xofd;
@@ -22,12 +22,12 @@ contract OFDPSWrapperTest is Test {
     error General(uint256 val);
 
     constructor() {
-        zofd = new OracleFreeDollar(0);
-        ofdps = Equity(address(zofd.reserve()));
+        ofd = new OracleFreeDollar(0);
+        ofdps = Equity(address(ofd.reserve()));
         wofdps = new OFDPSWrapper(ofdps);
         xofd = new TestToken("Base Dollar", "BUSD", uint8(18));
-        swap = new StablecoinBridge(address(xofd), address(zofd), 100000 ether);
-        zofd.initialize(address(swap), "");
+        swap = new StablecoinBridge(address(xofd), address(ofd), 100000 ether);
+        ofd.initialize(address(swap), "");
         xofd.mint(address(this), 100000 ether);
         xofd.approve(address(swap), 100000 ether);
         swap.mint(100000 ether);

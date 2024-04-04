@@ -37,14 +37,14 @@ async function mintMockVOLToken(amount: number, address: string) {
     await tokenContract.mint(address, floatToDec18(amount));
 }
 
-async function mintZOFD(amount: number) {
-    // mint ZOFD via XOFD bridge
+async function mintOFD(amount: number) {
+    // mint OFD via XOFD bridge
     let dAmount = floatToDec18(amount);
     let tokenContract = await getSigningManagerFromPK(mockXOFDAddr, ERC20_ABI, NODE_URL, pk);
     let bridgeContract = await getSigningManagerFromPK(bridgeAddr, BRIDGE_ABI, NODE_URL, pk);
     await tokenContract.approve(bridgeAddr, dAmount);
     let tx = await bridgeContract.mint(dAmount);
-    console.log("minted ZOFD:", tx.hash);
+    console.log("minted OFD:", tx.hash);
 }
 
 async function start() {
@@ -54,16 +54,16 @@ async function start() {
     //let address = "0x71C696acd63979B39B8eD5b7a8030c46f34Da716"; // manu
     console.log("minting for ", address);
 
-    //let zofdContract = await getSigningManagerFromPK("0xC578aC4f81112a87FD6eec13aE6e2C4d17129D4a", FC_ABI, NODE_URL, pk);
-    // create a minting hub too while we have no ZOFD supply
-    /*let tx = await zofdContract.suggestMinter("0x240b812F8B8E42b623E00707A12150FF7cE2d72F",
+    //let ofdContract = await getSigningManagerFromPK("0xC578aC4f81112a87FD6eec13aE6e2C4d17129D4a", FC_ABI, NODE_URL, pk);
+    // create a minting hub too while we have no OFD supply
+    /*let tx = await ofdContract.suggestMinter("0x240b812F8B8E42b623E00707A12150FF7cE2d72F",
         901, floatToDec18(1000), "Minting Hub",  { gasLimit: 2_000_000 });
     await tx.wait();
     console.log(tx);*/
 
     //await mintMockVOLToken(amount, address);
     //await mintXOFD(amount, address);
-    await mintZOFD(amount);
+    await mintOFD(amount);
 }
 
 start();

@@ -3,7 +3,6 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { deployContract } from "../deployUtils";
 
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  console.log("------ Deploying Minting Hub ------");
   const {
     deployments: { get },
     ethers,
@@ -14,14 +13,14 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     "PositionFactory",
     positionFactoryDeployment.address
   );
-  const zofdDeployment = await get("OracleFreeDollar");
-  let zofdContract = await ethers.getContractAt(
+  const ofdDeployment = await get("OracleFreeDollar");
+  let ofdContract = await ethers.getContractAt(
     "OracleFreeDollar",
-    zofdDeployment.address
+    ofdDeployment.address
   );
 
   let mintingHubContract = await deployContract(hre, "MintingHub", [
-    zofdDeployment.address,
+    ofdDeployment.address,
     positionFactoryDeployment.address,
   ]);
 
@@ -29,13 +28,13 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   console.log(`Verify mintingHubContract:
 npx hardhat verify --network sepolia ${await mintingHubContract.getAddress()} ${
-    zofdDeployment.address
+    ofdDeployment.address
   } ${positionFactoryDeployment.address}
 `);
 
-  // create a minting hub too while we have no ZOFD supply
+  // create a minting hub too while we have no OFD supply
   try {
-    let tx = await zofdContract.initialize(
+    let tx = await ofdContract.initialize(
       await mintingHubContract.getAddress(),
       "Minting Hub"
     );

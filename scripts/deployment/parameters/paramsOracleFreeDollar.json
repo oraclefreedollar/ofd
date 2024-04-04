@@ -14,7 +14,7 @@
     {
         "name": "OracleFreeDollar",
         "chainId": 1,
-        "chainName" : "Ethereum",
+        "chainName" : "Arbitrum",
         "minApplicationPeriod" : 1209600
     }
 ]

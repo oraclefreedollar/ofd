@@ -15,7 +15,7 @@ import "./interface/IPositionFactory.sol";
  */
 contract MintingHub {
     /**
-     * @notice Irrevocable fee in ZOFD when proposing a new position (but not when cloning an existing one).
+     * @notice Irrevocable fee in OFD when proposing a new position (but not when cloning an existing one).
      */
     uint256 public constant OPENING_FEE = 1000 * 10 ** 18;
 
@@ -27,7 +27,7 @@ contract MintingHub {
 
     IPositionFactory private immutable POSITION_FACTORY; // position contract to clone
 
-    IOracleFreeDollar public immutable zofd; // currency
+    IOracleFreeDollar public immutable ofd; // currency
     Challenge[] public challenges; // list of open challenges
 
     /**
@@ -46,7 +46,7 @@ contract MintingHub {
     event PositionOpened(
         address indexed owner,
         address indexed position,
-        address zofd,
+        address ofd,
         address collateral,
         uint256 price
     );
@@ -65,12 +65,12 @@ contract MintingHub {
     error InvalidPos();
 
     modifier validPos(address position) {
-        if (zofd.getPositionParent(position) != address(this)) revert InvalidPos();
+        if (ofd.getPositionParent(position) != address(this)) revert InvalidPos();
         _;
     }
 
-    constructor(address _zofd, address _factory) {
-        zofd = IOracleFreeDollar(_zofd);
+    constructor(address _ofd, address _factory) {
+        ofd = IOracleFreeDollar(_ofd);
         POSITION_FACTORY = IPositionFactory(_factory);
     }
 
@@ -110,7 +110,7 @@ contract MintingHub {
      * @param _collateralAddress        address of collateral token
      * @param _minCollateral     minimum collateral required to prevent dust amounts
      * @param _initialCollateral amount of initial collateral to be deposited
-     * @param _mintingMaximum    maximal amount of ZOFD that can be minted by the position owner
+     * @param _mintingMaximum    maximal amount of OFD that can be minted by the position owner
      * @param _expirationSeconds position tenor in unit of timestamp (seconds) from 'now'
      * @param _challengeSeconds  challenge period. Longer for less liquid collateral.
      * @param _annualInterestPPM ppm of minted amount that is paid as fee for each year of duration
@@ -135,11 +135,11 @@ contract MintingHub {
         require(CHALLENGER_REWARD <= _reservePPM && _reservePPM <= 1000000);
         require(IERC20(_collateralAddress).decimals() <= 24); // leaves 12 digits for price
         require(_initialCollateral >= _minCollateral, "must start with min col");
-        require(_minCollateral * _liqPrice >= 5000 ether * 10 ** 18); // must start with at least 5000 ZOFD worth of collateral
+        require(_minCollateral * _liqPrice >= 5000 ether * 10 ** 18); // must start with at least 5000 OFD worth of collateral
         IPosition pos = IPosition(
             POSITION_FACTORY.createNewPosition(
                 msg.sender,
-                address(zofd),
+                address(ofd),
                 _collateralAddress,
                 _minCollateral,
                 _mintingMaximum,
@@ -151,11 +151,11 @@ contract MintingHub {
                 _reservePPM
             )
         );
-        zofd.registerPosition(address(pos));
-        zofd.collectProfits(msg.sender, OPENING_FEE);
+        ofd.registerPosition(address(pos));
+        ofd.collectProfits(msg.sender, OPENING_FEE);
         IERC20(_collateralAddress).transferFrom(msg.sender, address(pos), _initialCollateral);
 
-        emit PositionOpened(msg.sender, address(pos), address(zofd), _collateralAddress, _liqPrice);
+        emit PositionOpened(msg.sender, address(pos), address(ofd), _collateralAddress, _liqPrice);
         return address(pos);
     }
 
@@ -173,14 +173,14 @@ contract MintingHub {
         require(expiration <= IPosition(existing.original()).expiration());
         existing.reduceLimitForClone(_initialMint);
         address pos = POSITION_FACTORY.clonePosition(position);
-        zofd.registerPosition(pos);
+        ofd.registerPosition(pos);
         IPosition(pos).initializeClone(msg.sender, existing.price(), _initialCollateral, _initialMint, expiration);
         existing.collateral().transferFrom(msg.sender, pos, _initialCollateral);
 
         emit PositionOpened(
             msg.sender,
             address(pos),
-            address(zofd),
+            address(ofd),
             address(IPosition(pos).collateral()),
             IPosition(pos).price()
         );
@@ -210,7 +210,7 @@ contract MintingHub {
     }
 
     /**
-     * @notice Post a bid in ZOFD given an open challenge.
+     * @notice Post a bid in OFD given an open challenge.
      *
      * @dev In case that the collateral cannot be transfered back to the challenger (i.e. because the collateral token
      * has a blacklist and the challenger is on it), it is possible to postpone the return of the collateral.
@@ -256,9 +256,9 @@ contract MintingHub {
         // No overflow possible thanks to invariant (col * price <= limit * 10**18)
         // enforced in Position.setPrice and knowing that collateral <= col.
         uint256 offer = (_calculatePrice(_challenge.start + phase1, phase2, liqPrice) * collateral) / 10 ** 18;
-        zofd.transferFrom(msg.sender, address(this), offer); // get money from bidder
+        ofd.transferFrom(msg.sender, address(this), offer); // get money from bidder
         uint256 reward = (offer * CHALLENGER_REWARD) / 1000_000;
-        zofd.transfer(_challenge.challenger, reward); // pay out the challenger reward
+        ofd.transfer(_challenge.challenger, reward); // pay out the challenger reward
         uint256 fundsAvailable = offer - reward; // funds available after reward
 
         // Example: available funds are 90, repayment is 50, reserve 20%. Then 20%*(90-50)=16 are collected as profits
@@ -272,21 +272,21 @@ contract MintingHub {
             // for excess fund distribution, which make position owners that maxed out their positions slightly better
             // off in comparison to those who did not.
             uint256 profits = reservePPM * (fundsAvailable - repayment) / 1000_000;
-            zofd.collectProfits(address(this), profits);
-            zofd.transfer(owner, fundsAvailable - repayment - profits);
+            ofd.collectProfits(address(this), profits);
+            ofd.transfer(owner, fundsAvailable - repayment - profits);
         } else if (fundsAvailable < repayment) {
-            zofd.coverLoss(address(this), repayment - fundsAvailable); // ensure we have enough to pay everything
+            ofd.coverLoss(address(this), repayment - fundsAvailable); // ensure we have enough to pay everything
         }
-        zofd.burnWithoutReserve(repayment, reservePPM); // Repay the challenged part, example: 50 ZOFD leading to 10 ZOFD in implicit profits
+        ofd.burnWithoutReserve(repayment, reservePPM); // Repay the challenged part, example: 50 OFD leading to 10 OFD in implicit profits
         return (collateral, offer);
     }
 
     function _avertChallenge(Challenge memory _challenge, uint32 number, uint256 liqPrice, uint256 size) internal {
-        require(block.timestamp != _challenge.start); // do not allow to avert the challenge in the same transaction, see CS-ZOFD-037
+        require(block.timestamp != _challenge.start); // do not allow to avert the challenge in the same transaction, see CS-OFD-037
         if (msg.sender == _challenge.challenger) {
             // allow challenger to cancel challenge without paying themselves
         } else {
-            zofd.transferFrom(msg.sender, _challenge.challenger, (size * liqPrice) / (10 ** 18));
+            ofd.transferFrom(msg.sender, _challenge.challenger, (size * liqPrice) / (10 ** 18));
         }
 
         _challenge.position.notifyChallengeAverted(size);

@@ -5,12 +5,11 @@ import { floatToDec18 } from "../../math";
 /*
     HOWTO
     - inspect config file parameters/paramsPositions
-    - ensure minter has enough collateral and ZOFD to ask for position
+    - ensure minter has enough collateral and OFD to ask for position
     - run via: npm run-script deployPositions:network sepolia
 */
 
 async function deployPos(params: any, hre: HardhatRuntimeEnvironment) {
-  console.log("------ deployPos ------");
   /*
     let tx = await mintingHubContract.openPosition(collateral, minCollateral,
         fInitialCollateral, initialLimit, duration, challengePeriod, fFees,
@@ -33,13 +32,13 @@ async function deployPos(params: any, hre: HardhatRuntimeEnvironment) {
   let collateralAddr = params.collateralTknAddr;
   let ofdMinCollateral = floatToDec18(params.minCollateral);
   let ofdInitialCollateral = floatToDec18(params.initialCollateral);
-  let initialLimitZOFD = floatToDec18(params.initialLimitZOFD);
+  let initialLimitOFD = floatToDec18(params.initialLimitOFD);
   let duration = BigInt(params.durationDays) * 86_400n;
   let challengePeriod = BigInt(params.challengePeriodSeconds);
   let feesPPM = BigInt(params.feesPercent * 1e4);
   let fliqPrice = floatToDec18(params.liqPriceOFD);
   let fReservePPM = BigInt(params.reservePercent * 1e4);
-  let fOpeningFeeZOFD = 1000n * BigInt(1e18);
+  let fOpeningFeeOFD = 1000n * BigInt(1e18);
 
   console.log(' before getContractAt ', params.name, params.collateralTknAddr)
 
@@ -51,8 +50,8 @@ async function deployPos(params: any, hre: HardhatRuntimeEnvironment) {
   console.log("after variables");
 
   //console.log("Collateral balance of owner = ", dec18ToFloat(balColl));
-  //console.log("ZOFD balance of owner = ", dec18ToFloat(balZOFD));
-  console.log("ZOFD address ", ofdDeployment.address);
+  //console.log("OFD balance of owner = ", dec18ToFloat(balOFD));
+  console.log("OFD address ", ofdDeployment.address);
   console.log("coll address ", params.collateralTknAddr);
 
   let tx1 = await CollateralContract.approve(
@@ -78,7 +77,7 @@ async function deployPos(params: any, hre: HardhatRuntimeEnvironment) {
   //   collateralAddr.toString(),
   //   ofdMinCollateral.toString(),
   //   ofdInitialCollateral.toString(),
-  //   initialLimitZOFD.toString(),
+  //   initialLimitOFD.toString(),
   //   duration.toString(),
   //   challengePeriod.toString(),
   //   feesPPM.toString(),
@@ -89,7 +88,7 @@ async function deployPos(params: any, hre: HardhatRuntimeEnvironment) {
     collateralAddr,
     ofdMinCollateral,
     ofdInitialCollateral,
-    initialLimitZOFD,
+    initialLimitOFD,
     duration,
     challengePeriod,
     feesPPM,
@@ -101,25 +100,19 @@ async function deployPos(params: any, hre: HardhatRuntimeEnvironment) {
 
   // console.log("Arguments for verification of position:");
   // console.log(
-  //   `npx hardhat verify --network sepolia <POSITIONADDRESS> ${accounts[0]} ${mintingHubDeployment.address} ${fcDeployment.address} ${collateralAddr} ${fMinCollateral} ${fInitialCollateral} ${initialLimitZOFD} ${duration} ${challengePeriod} ${feesPPM} ${fliqPrice} ${fReservePPM}`
+  //   `npx hardhat verify --network sepolia <POSITIONADDRESS> ${accounts[0]} ${mintingHubDeployment.address} ${fcDeployment.address} ${collateralAddr} ${fMinCollateral} ${fInitialCollateral} ${initialLimitOFD} ${duration} ${challengePeriod} ${feesPPM} ${fliqPrice} ${fReservePPM}`
   // );
   return tx.hash;
 }
 
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  console.log("------ Deploying positions ------");
   const paramFile = "paramsPositions.json";
-  console.log("paramFile = ", paramFile)
   let chainId = hre.network.config["chainId"];
-  console.log("chainId = ", chainId)
   let paramsArr = require(__dirname + `/../parameters/${paramFile}`);
-  console.log("paramsArr = ", paramsArr)
   // find config for current chain
   for (var k = 0; k < paramsArr.length; k++) {
     let params = paramsArr[k];
-    console.log("Deploying position for chainId = ", chainId);
     if (chainId == params.chainId) {
-      console.log("Deploying position for chainId  inside IF = ", chainId);
       // deploy position according to parameters
       let txh = await deployPos(params, hre);
       console.log("Deployed position, tx hash =", txh);

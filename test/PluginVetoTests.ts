@@ -11,7 +11,7 @@ describe("Plugin Veto Tests", () => {
 
   let bridge: StablecoinBridge;
   let secondBridge: StablecoinBridge;
-  let zofd: OracleFreeDollar;
+  let ofd: OracleFreeDollar;
   let mockXOFD: TestToken;
   let mockDOFD: TestToken;
 
@@ -19,7 +19,7 @@ describe("Plugin Veto Tests", () => {
     [owner, alice] = await ethers.getSigners();
     // create contracts
     const oracleFreeDollarFactory = await ethers.getContractFactory("OracleFreeDollar");
-    zofd = await oracleFreeDollarFactory.deploy(10 * 86400);
+    ofd = await oracleFreeDollarFactory.deploy(10 * 86400);
 
     // mocktoken
     const xchfFactory = await ethers.getContractFactory("TestToken");
@@ -29,16 +29,16 @@ describe("Plugin Veto Tests", () => {
     const bridgeFactory = await ethers.getContractFactory("StablecoinBridge");
     bridge = await bridgeFactory.deploy(
       await mockXOFD.getAddress(),
-      await zofd.getAddress(),
+      await ofd.getAddress(),
       limit
     );
-    await zofd.initialize(await bridge.getAddress(), "");
+    await ofd.initialize(await bridge.getAddress(), "");
     // wait for 1 block
     await evm_increaseTime(60);
-    // now we are ready to bootstrap ZOFD with Mock-XOFD
+    // now we are ready to bootstrap OFD with Mock-XOFD
     await mockXOFD.mint(owner.address, limit / 2n);
     await mockXOFD.mint(alice.address, limit / 2n);
-    // mint some ZOFD to block bridges without veto
+    // mint some OFD to block bridges without veto
     let amount = floatToDec18(20_000);
     await mockXOFD.connect(alice).approve(await bridge.getAddress(), amount);
     await bridge.connect(alice).mint(amount);
@@ -57,21 +57,21 @@ describe("Plugin Veto Tests", () => {
       const bridgeFactory = await ethers.getContractFactory("StablecoinBridge");
       secondBridge = await bridgeFactory.deploy(
         await mockDOFD.getAddress(),
-        await zofd.getAddress(),
+        await ofd.getAddress(),
         limit
       );
     });
     it("Participant suggests minter", async () => {
-      let applicationPeriod = await zofd.MIN_APPLICATION_PERIOD();
-      let applicationFee = await zofd.MIN_FEE();
+      let applicationPeriod = await ofd.MIN_APPLICATION_PERIOD();
+      let applicationFee = await ofd.MIN_FEE();
       let msg = "DOFD Bridge";
       await mockXOFD
         .connect(alice)
-        .approve(await zofd.getAddress(), applicationFee);
-      let balance = await zofd.balanceOf(alice.address);
+        .approve(await ofd.getAddress(), applicationFee);
+      let balance = await ofd.balanceOf(alice.address);
       expect(balance).to.be.greaterThan(applicationFee);
       await expect(
-        zofd
+        ofd
           .connect(alice)
           .suggestMinter(
             await secondBridge.getAddress(),
@@ -79,7 +79,7 @@ describe("Plugin Veto Tests", () => {
             applicationFee,
             msg
           )
-      ).to.emit(zofd, "MinterApplied");
+      ).to.emit(ofd, "MinterApplied");
     });
     it("can't mint before min period", async () => {
       let amount = floatToDec18(1_000);
@@ -89,15 +89,15 @@ describe("Plugin Veto Tests", () => {
       // set allowance
       await expect(
         secondBridge.connect(alice).mint(amount)
-      ).to.be.revertedWithCustomError(zofd, "NotMinter");
+      ).to.be.revertedWithCustomError(ofd, "NotMinter");
     });
     it("deny minter", async () => {
       await expect(
-        zofd.denyMinter(await secondBridge.getAddress(), [], "other denied")
-      ).to.emit(zofd, "MinterDenied");
+        ofd.denyMinter(await secondBridge.getAddress(), [], "other denied")
+      ).to.emit(ofd, "MinterDenied");
       await expect(
         secondBridge.connect(alice).mint(floatToDec18(1_000))
-      ).to.be.revertedWithCustomError(zofd, "NotMinter");
+      ).to.be.revertedWithCustomError(ofd, "NotMinter");
     });
   });
 });

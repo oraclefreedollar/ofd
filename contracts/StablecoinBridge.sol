@@ -12,7 +12,7 @@ import "./interface/IOracleFreeDollar.sol";
  */
 contract StablecoinBridge {
     IERC20 public immutable usd; // the source stablecoin
-    IOracleFreeDollar public immutable zofd; // the OracleFreeDollar
+    IOracleFreeDollar public immutable ofd; // the OracleFreeDollar
 
     /**
      * @notice The time horizon after which this bridge expires and needs to be replaced by a new contract.
@@ -31,7 +31,7 @@ contract StablecoinBridge {
 
     constructor(address other, address ofdAddress, uint256 limit_) {
         usd = IERC20(other);
-        zofd = IOracleFreeDollar(ofdAddress);
+        ofd = IOracleFreeDollar(ofdAddress);
         horizon = block.timestamp + 52 weeks;
         limit = limit_;
         minted = 0;
@@ -55,7 +55,7 @@ contract StablecoinBridge {
 
     function _mint(address target, uint256 amount) internal {
         if (block.timestamp > horizon) revert Expired(block.timestamp, horizon);
-        zofd.mint(target, amount);
+        ofd.mint(target, amount);
         minted += amount;
         if (minted > limit) revert Limit(amount, limit);
     }
@@ -75,7 +75,7 @@ contract StablecoinBridge {
     }
 
     function _burn(address ofdHolder, address target, uint256 amount) internal {
-        zofd.burnFrom(ofdHolder, amount);
+        ofd.burnFrom(ofdHolder, amount);
         usd.transfer(target, amount);
         minted -= amount;
     }

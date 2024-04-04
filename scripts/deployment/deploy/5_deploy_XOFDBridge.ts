@@ -19,7 +19,6 @@ async function getAddress() {
 }
 
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  console.log('------ Deploying XOFD Bridge ------')
   const limit = 10_000_000;
   const {
     deployments: { get },
@@ -45,17 +44,17 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     xofdAddress = "0xb4272071ecadd69d933adcd19ca99fe80664fc08";
     applicationMsg = "XOFD Bridge";
   }
-  const ZOFDDeployment = await get("OracleFreeDollar");
-  let zofdContract = await ethers.getContractAt(
+  const OFDDeployment = await get("OracleFreeDollar");
+  let ofdContract = await ethers.getContractAt(
     "OracleFreeDollar",
-    ZOFDDeployment.address
+    OFDDeployment.address
   );
 
   let dLimit = floatToDec18(limit);
   console.log("\nDeploying StablecoinBridge with limit = ", limit, "OFD");
   await deployContract(hre, "StablecoinBridge", [
     xofdAddress,
-    ZOFDDeployment.address,
+    OFDDeployment.address,
     dLimit,
   ]);
 
@@ -64,10 +63,10 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   let bridgeAddr: string = bridgeDeployment.address;
 
   console.log(
-    `Verify StablecoinBridge:\nnpx hardhat verify --network sepolia ${bridgeAddr} ${xofdAddress} ${ZOFDDeployment.address} ${dLimit}\n`
+    `Verify StablecoinBridge:\nnpx hardhat verify --network sepolia ${bridgeAddr} ${xofdAddress} ${OFDDeployment.address} ${dLimit}\n`
   );
 
-  let isAlreadyMinter = await zofdContract.isMinter(bridgeAddr);
+  let isAlreadyMinter = await ofdContract.isMinter(bridgeAddr);
   if (isAlreadyMinter) {
     console.log(bridgeDeployment.address, "already is a minter");
   } else {
@@ -75,9 +74,9 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     console.log(
       "Apply for the bridge ",
       bridgeDeployment.address,
-      "to be minter via zofd.suggestMinter"
+      "to be minter via ofd.suggestMinter"
     );
-    let tx = await zofdContract.initialize(bridgeDeployment.address, msg);
+    let tx = await ofdContract.initialize(bridgeDeployment.address, msg);
     console.log("tx hash = ", tx.hash);
     await tx.wait();
     let isMinter = false;
@@ -85,7 +84,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     while (!isMinter && trial < 5) {
       console.log("Waiting 20s...");
       await sleep(20 * 1000);
-      isMinter = await zofdContract.isMinter(bridgeAddr, {
+      isMinter = await ofdContract.isMinter(bridgeAddr, {
         gasLimit: 1_000_000,
       });
       console.log("Is minter? ", isMinter);
