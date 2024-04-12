@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import "./OracleFreeDollar.sol";
 import "./utils/MathUtil.sol";
 import "./interface/IReserve.sol";
+import "./interface/IOracleFreeDollar.sol";
 import "./interface/IERC677Receiver.sol";
 import "./utils/ERC20PermitLight.sol";
 
@@ -33,7 +33,7 @@ contract Equity is ERC20PermitLight, MathUtil, IReserve {
      * I.e., the supply is proporational to the cubic root of the reserve and the price is proportional to the
      * squared cubic root. When profits accumulate or losses materialize, the reserve, the market cap,
      * and the price are adjusted proportionally, with the supply staying constant. In the absence of an extreme
-     * inflation of the Swiss franc, it is unlikely that there will ever be more than ten million OFDPS.
+     * inflation of the American Dollar, it is unlikely that there will ever be more than ten million OFDPS.
      */
     uint32 public constant VALUATION_FACTOR = 3;
 
@@ -57,7 +57,7 @@ contract Equity is ERC20PermitLight, MathUtil, IReserve {
      */
     uint256 public constant MIN_HOLDING_DURATION = 90 days << TIME_RESOLUTION_BITS; // Set to 5 for local testing
 
-    OracleFreeDollar public immutable ofd;
+    IOracleFreeDollar public immutable ofd;
 
     /**
      * @dev To track the total number of votes we need to know the number of votes at the anchor time and when the
@@ -89,7 +89,7 @@ contract Equity is ERC20PermitLight, MathUtil, IReserve {
     event Delegation(address indexed from, address indexed to); // indicates a delegation
     event Trade(address who, int amount, uint totPrice, uint newprice); // amount pos or neg for mint or redemption
 
-    constructor(OracleFreeDollar ofd_) ERC20(18) {
+    constructor(IOracleFreeDollar ofd_) ERC20(18) {
         ofd = ofd_;
     }
 

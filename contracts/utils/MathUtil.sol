@@ -2,8 +2,6 @@
 
 pragma solidity ^0.8.0;
 
-import {OracleFreeDollar} from "../OracleFreeDollar.sol";
-
 /**
  * @title Functions for share valuation
  */

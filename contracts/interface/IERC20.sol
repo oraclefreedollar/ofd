@@ -1,5 +1,5 @@
+// SPDX-License-Identifier: MIT
 /**
- * SPDX-License-Identifier: MIT
  *
  * Copyright (c) 2016-2019 zOS Global Limited
  *

@@ -23,7 +23,7 @@ describe("Plugin Veto Tests", () => {
 
     // mocktoken
     const xchfFactory = await ethers.getContractFactory("TestToken");
-    mockXOFD = await xchfFactory.deploy("CryptoFranc", "XOFD", 18);
+    mockXOFD = await xchfFactory.deploy("CryptoDollar", "XOFD", 18);
     // mocktoken bridge to bootstrap
     let limit = floatToDec18(100_000);
     const bridgeFactory = await ethers.getContractFactory("StablecoinBridge");

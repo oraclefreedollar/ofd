@@ -19,7 +19,7 @@ describe("Equity Tests", () => {
     [owner, alice, bob] = await ethers.getSigners();
 
     const xofdFactory = await ethers.getContractFactory("TestToken");
-    xofd = await xofdFactory.deploy("CryptoFranc", "XOFD", 18);
+    xofd = await xofdFactory.deploy("CryptoDollar", "XOFD", 18);
   });
 
   beforeEach(async () => {

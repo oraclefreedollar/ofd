@@ -2,7 +2,7 @@
     {
         "inputs": [
             {
-                "internalType": "contract OracleFreeDollar",
+                "internalType": "contract IOracleFreeDollar",
                 "name": "ofd_",
                 "type": "address"
             }
@@ -481,7 +481,7 @@
         "name": "ofd",
         "outputs": [
             {
-                "internalType": "contract OracleFreeDollar",
+                "internalType": "contract IOracleFreeDollar",
                 "name": "",
                 "type": "address"
             }

@@ -251,7 +251,7 @@ describe("OracleFreeDollar", () => {
       ofd = await oracleFreeDollarFactory.deploy(10 * 86400);
 
       const xofdFactory = await ethers.getContractFactory("TestToken");
-      mockXOFD = await xofdFactory.deploy("CryptoFranc", "XOFD", 18);
+      mockXOFD = await xofdFactory.deploy("CryptoDollar", "XOFD", 18);
 
       const bridgeFactory = await ethers.getContractFactory("StablecoinBridge");
       bridge = await bridgeFactory.deploy(
