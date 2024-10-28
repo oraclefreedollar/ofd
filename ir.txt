@@ -1,0 +1,42 @@
+Incident Report 
+Date Oct 26.10.2024
+
+Affected System: Oracle Free Dollar Protocol (OFD) on Binance Smart Chain (BSC)
+
+Incident Summary: An exploit was detected after the first vUSDT position was opened in the Oracle Free Dollar Protocol. A flashbot attack was executed in transaction 0x4eeb47d569c6051e78010ee9e5fc3945be6314f9a4ca39de2ec9aaef63d1e922, resulting in the unauthorized minting of 535,516 OFD without collateral backing.
+
+Key Findings
+
+1) Locked OFD Tokens in Attack Contract:
+The attacker did not move the minted OFD tokens out of the contract. This is notable because a liquidity pool of 200,000 USDT was available, suggesting the OFD is locked within the attacker’s contract, preventing any liquidation.
+2) Root Cause:
+The issue stemmed from the acceptance of vUSDT, a token with dynamic balance accounting, without veto. Tokens with dynamic balance accounting should be considered incompatible with the protocol as they present potential risks if not properly managed.
+3) Community Action Needed:
+To prevent similar issues, the community is encouraged to veto the acceptance of any token that does not follow standard ERC-20 accounting (static balance).
+4) Swaps Restricted to Protocol Interface:
+USDT-OFD swaps should only be executed through the official OFD contract or protocol frontend to maintain control over token transactions and interactions.
+
+Implemented Changes
+
+Frontend Adjustment for Total Supply:
+The 535,516 OFD minted through this exploit has been deducted from the displayed total supply on the frontend to prevent any misinterpretation of circulating supply.
+
+Display Restrictions on vUSDT Positions:
+vUSDT positions are no longer displayed in the frontend to avoid accidental cloning or unauthorized replication of vUSDT-backed positions.
+
+Cloning Prevention of vUSDT Positions:
+Cloning of vUSDT-backed positions has been restricted in the frontend, ensuring that only authorized collateral types with static balance properties are considered in the protocol’s position listings.
+
+Next Steps and Recommendations
+
+Enhanced Community Vetting:
+Implement community awareness on voting criteria for collateral acceptance, particularly requiring vetoes on any token with dynamic balance accounting features.
+
+Protocol Safeguards:
+Review and enhance OFD’s contract functions to validate ERC-20 compliance and ensure any token with atypical balance mechanics triggers an automated veto.
+
+Security Audits:
+Push further White Hat Hacker Analytics about 1).
+
+This incident highlights the importance of careful collateral vetting and community vigilance in preventing unauthorized activity within the Oracle Free Dollar Protocol. These measures aim to strengthen protocol security and community confidence in OFD's operations.
+
