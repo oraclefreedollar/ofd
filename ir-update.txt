@@ -1,0 +1,15 @@
+Problem:
+-------
+USDT in the bridging contract was at risk since the attacker was minting a large amount of OFD in the frontrun attack
+
+Solutions:
+-----------
+The OFDPS in the initial multisig has been used today to mint OFD and to secure the USDT in the bridge. 
+
+There will be a updated version 2 of OFD in near future - the new version will not be able to frontrun
+
+Consequence:
+-------------
+Please do not interact with the Oracle Free Dollar frontend or the Oracle Free Dollar procol until the code is updated.
+
+All users will have the same amount of token in then updated version 2 of OFD as they had at the snapshot on nov 19th 
