@@ -12,7 +12,7 @@
     "deploy:network": "npx hardhat deploy --network",
     "deploynotesttoken:network": "export deploymode=base && export deploymode=base && npx hardhat deploy --network",
     "redeploynotesttoken:network": "export deployoption=notesttoken && export deploymode=base && npx hardhat deploy --reset --network",
-    "redeploy:network": "npx hardhat deploymode=base --reset --network",
+    "redeploy:network": "npx hardhat deploy --reset --network",
     "deployPositions:network": "export deploymode=pos && npx hardhat deploy --network"
   },
   "repository": {

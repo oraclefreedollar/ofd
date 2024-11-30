@@ -12,10 +12,9 @@ import dotenv from "dotenv";
 import {SigningKey} from '@ethersproject/signing-key'
 dotenv.config();
 
-
-
 let pk: string | SigningKey = <string>process.env.SEPOLIA_PK;
-let etherscanapikey: string = <string>process.env.APIKEY;
+let etherscanapikey: string = <string>process.env.SEPOLIA_API_KEY;
+let bnbTestnetApiKey: string = <string>process.env.BNBTESTNET_API_KEY;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -33,6 +32,22 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
+    bscMainnet:{
+      url: "https://bsc-dataseed.bnbchain.org/",
+      chainId: 56,
+      gas: 50_000,
+      gasPrice: "auto",
+      accounts: [pk],
+      timeout: 50_000,
+    },
+    bnbtestnet:{
+        url: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+        chainId: 97,
+        gas: 50_000,
+        gasPrice: "auto",
+        accounts: [pk],
+        timeout: 50_000,
+    },
     sepolia: {
       url: "https://arbitrum-sepolia.infura.io/v3/f283aed9f80f4f91bc513c27e2da9b1e",
       chainId: 421614,
@@ -48,7 +63,24 @@ const config: HardhatUserConfig = {
     },
   },
   etherscan: {
-    apiKey: etherscanapikey,
+    apiKey: {
+      bsc: etherscanapikey,
+      bscTestnet: etherscanapikey,
+      sepolia: etherscanapikey,
+      arbitrumOne: etherscanapikey,
+      arbitrumGoerli: etherscanapikey,
+      arbitrumSepolia: etherscanapikey,
+    },
+    customChains: [
+      {
+        network: "sepolia",
+        chainId: 421614,
+        urls: {
+          apiURL: "https://api-sepolia.arbiscan.io/api",
+          browserURL: "https://sepolia.arbiscan.io/",
+        },
+      },
+    ],
   },
   paths: {
     sources: "./contracts",
