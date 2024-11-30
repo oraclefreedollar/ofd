@@ -18,7 +18,7 @@ timeline:
 ----------
 go-live v2 december 2024
 
-SNAPSHOT no 19th
+SNAPSHOT OFDPS on 19th
 ----------------
 "HolderAddress","Balance","PendingBalanceUpdate"
 "0x8181fb4ccedde9e0f08f712cd303c463fe88594d","400.320635907719262536","No"
