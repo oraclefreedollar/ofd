@@ -18,6 +18,22 @@
   {
     "name": "MockVOLToken",
     "type": "mock",
+    "chainName": "BNBTestnet",
+    "chainId": 97,
+    "collateralTknAddr": "0x8708eB92a2d2483F4795542d7b3Ebd7909f05702",
+    "minCollateral": 5,
+    "initialCollateral": 25,
+    "initialLimitOFD": 40000,
+    "feesPercent": 2,
+    "liqPriceOFD": 1000,
+    "reservePercent": 10,
+    "durationDays": 180,
+    "challengePeriodSeconds": 901,
+    "minApplicationPeriodSeconds": 900
+  },
+  {
+    "name": "MockVOLToken",
+    "type": "mock",
     "chainName": "Local",
     "chainId": 31337,
     "minCollateral": 5,
