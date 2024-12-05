@@ -1,23 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./Strings.sol";
-import "./TestToken.sol";
-import "../Equity.sol";
-import "../utils/Ownable.sol";
+import './Strings.sol';
+import './TestToken.sol';
+import '../Equity.sol';
+import '../utils/Ownable.sol';
 import "../Position.sol";
 import "../MintingHub.sol";
-import "../StablecoinBridge.sol";
-import "../interface/IPosition.sol";
-import "../interface/IReserve.sol";
-import "../interface/IOracleFreeDollar.sol";
-import "../interface/IERC20.sol";
+import '../StablecoinBridge.sol';
+import '../interface/IPosition.sol';
+import '../interface/IReserve.sol';
+import '../interface/IOracleFreeDollar.sol';
+import '../interface/IERC20.sol';
 
 contract MintingHubTest {
     MintingHub hub;
     StablecoinBridge swap;
 
-    IERC20 xusd;
+    IERC20 usd;
     TestToken col;
     IOracleFreeDollar ofd;
 
@@ -31,7 +31,7 @@ contract MintingHubTest {
         hub = MintingHub(hub_);
         swap = StablecoinBridge(swap_);
         col = new TestToken("Some Collateral", "COL", uint8(0));
-        xusd = swap.usd();
+        usd = swap.usd();
         ofd = swap.ofd();
         alice = new User(ofd);
         bob = new User(ofd);
@@ -122,7 +122,7 @@ contract MintingHubTest {
 
     function endChallenge(uint256 challengeNumber) public {
         uint256 equityBefore = ofd.equity();
-        (address challenger, uint64 start, IPosition p, uint256 size) = hub.challenges(challengeNumber);
+        (address challenger, uint40 start, IPosition p, uint256 size) = hub.challenges(challengeNumber);
         require(challenger != address(0x0), "challenge not found");
         // hub.end(challengeNumber, true);
         User user = challenger == address(bob) ? bob : alice;
@@ -230,10 +230,10 @@ contract User {
     }
 
     function obtainOracleFreeDollars(StablecoinBridge bridge, uint256 amount) public {
-        TestToken xusd = TestToken(address(bridge.usd()));
-        xusd.mint(address(this), amount);
-        xusd.approve(address(bridge), amount);
-        require(xusd.allowance(address(this), address(bridge)) == amount);
+        TestToken usd = TestToken(address(bridge.usd()));
+        usd.mint(address(this), amount);
+        usd.approve(address(bridge), amount);
+        require(usd.allowance(address(this), address(bridge)) == amount);
         bridge.mint(amount);
     }
 
@@ -249,11 +249,12 @@ contract User {
         col.mint(address(this), 1001);
         col.approve(address(hub), 1001);
         uint256 balanceBefore = ofd.balanceOf(address(this));
-        address pos = hub.openPositionOneWeek(
+        address pos = hub.openPosition(
             address(col),
             100,
             1001,
             1000000 ether,
+            7 days,
             100 days,
             1 days,
             25000,
