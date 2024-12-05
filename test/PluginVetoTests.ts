@@ -22,8 +22,8 @@ describe("Plugin Veto Tests", () => {
     ofd = await oracleFreeDollarFactory.deploy(10 * 86400);
 
     // mocktoken
-    const xchfFactory = await ethers.getContractFactory("TestToken");
-    mockXOFD = await xchfFactory.deploy("CryptoDollar", "XOFD", 18);
+    const xofdFactory = await ethers.getContractFactory("TestToken");
+    mockXOFD = await xofdFactory.deploy("CryptoDollar", "XOFD", 18);
     // mocktoken bridge to bootstrap
     let limit = floatToDec18(100_000);
     const bridgeFactory = await ethers.getContractFactory("StablecoinBridge");

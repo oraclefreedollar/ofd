@@ -45,8 +45,6 @@ contract OFDPSWrapperTest is Test {
         uint256 tot = ofdps.totalVotes();
         wofdps.halveHoldingDuration(new address[](0));
         uint256 votesAfter = ofdps.votes(address(wofdps));
-        console.log("wofdps votes ", ofdps.votes(address(wofdps)));
-        console.log("total votes ", ofdps.totalVotes());
         require(votesAfter == votesBefore / 2);
         require(ofdps.totalVotes() == tot + votesAfter - votesBefore);
         vm.expectRevert();
