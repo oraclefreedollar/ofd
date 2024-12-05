@@ -48,14 +48,6 @@ const config: HardhatUserConfig = {
         accounts: [pk],
         timeout: 50_000,
     },
-    sepolia: {
-      url: "https://arbitrum-sepolia.infura.io/v3/f283aed9f80f4f91bc513c27e2da9b1e",
-      chainId: 421614,
-      gas: 50_000,
-      gasPrice: "auto",
-      accounts: [pk],
-      timeout: 50_000,
-    },
   },
   namedAccounts: {
     deployer: {
@@ -66,21 +58,10 @@ const config: HardhatUserConfig = {
     apiKey: {
       bsc: etherscanapikey,
       bscTestnet: etherscanapikey,
-      sepolia: etherscanapikey,
-      arbitrumOne: etherscanapikey,
-      arbitrumGoerli: etherscanapikey,
-      arbitrumSepolia: etherscanapikey,
     },
-    customChains: [
-      {
-        network: "sepolia",
-        chainId: 421614,
-        urls: {
-          apiURL: "https://api-sepolia.arbiscan.io/api",
-          browserURL: "https://sepolia.arbiscan.io/",
-        },
-      },
-    ],
+  },
+  sourcify: {
+    enabled: true,
   },
   paths: {
     sources: "./contracts",
