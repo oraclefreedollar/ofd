@@ -26,11 +26,10 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   } = hre;
   let xofdAddress;
   let applicationMsg;
-  if (["hardhat", "localhost", "sepolia"].includes(hre.network.name)) {
+  if (["hardhat", "localhost", "bnbtestnet"].includes(hre.network.name)) {
     console.log("Setting Mock-XOFD-Token Bridge");
     try {
-      const xofdDeployment = await get("TestToken");
-      xofdAddress = xofdDeployment.address;
+      xofdAddress = '';
     } catch (err: unknown) {
       xofdAddress = await getAddress();
       if (xofdAddress == "") {
@@ -41,20 +40,29 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     applicationMsg = "MockXOFD Token Bridge";
   } else {
     console.log("Deploying XOFD-Token Bridge");
-    xofdAddress = "0xb4272071ecadd69d933adcd19ca99fe80664fc08";
+    xofdAddress = "";
     applicationMsg = "XOFD Bridge";
   }
-  const OFDDeployment = await get("OracleFreeDollar");
+  const ofdAddress: string = '';
+
+  if (xofdAddress.length === 0) {
+    throw new Error("XOFD address is not set, please set it in the script");
+  }
+
+  if (ofdAddress.length === 0) {
+    throw new Error("OFD address is not set, please set it in the script");
+  }
+
   let ofdContract = await ethers.getContractAt(
     "OracleFreeDollar",
-    OFDDeployment.address
+    ofdAddress
   );
 
   let dLimit = floatToDec18(limit);
   console.log("\nDeploying StablecoinBridge with limit = ", limit, "OFD");
   await deployContract(hre, "StablecoinBridge", [
     xofdAddress,
-    OFDDeployment.address,
+    ofdAddress,
     dLimit,
   ]);
 
@@ -63,7 +71,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   let bridgeAddr: string = bridgeDeployment.address;
 
   console.log(
-    `Verify StablecoinBridge:\nnpx hardhat verify --network sepolia ${bridgeAddr} ${xofdAddress} ${OFDDeployment.address} ${dLimit}\n`
+    `Verify StablecoinBridge:\nnpx hardhat verify --network sepolia ${bridgeAddr} ${xofdAddress} ${ofdAddress} ${dLimit}\n`
   );
 
   let isAlreadyMinter = await ofdContract.isMinter(bridgeAddr);
@@ -92,7 +100,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     }
   }
 
-  if (["hardhat", "localhost", "sepolia"].includes(hre.network.name)) {
+  if (["hardhat", "localhost", "bnbtestnet"].includes(hre.network.name)) {
     let amount = floatToDec18(20_000);
     const mockXOFD = await ethers.getContractAt("TestToken", xofdAddress);
     await mockXOFD.approve(bridgeAddr, amount);

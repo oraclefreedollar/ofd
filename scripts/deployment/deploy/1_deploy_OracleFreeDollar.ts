@@ -30,12 +30,12 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   let OFD = await deployContract(hre, "OracleFreeDollar", [minApplicationPeriod]);
   console.log(
-    `Verify OracleFreeDollar:\nnpx hardhat verify --network sepolia ${await OFD.getAddress()} ${minApplicationPeriod}`
+    `Verify OracleFreeDollar:\nnpx hardhat verify --network bnbtestnet ${await OFD.getAddress()} ${minApplicationPeriod}`
   );
 
   let reserve = await OFD.reserve();
   console.log(
-    `Verify Equity:\nnpx hardhat verify --network sepolia ${reserve} ${await OFD.getAddress()}\n`
+    `Verify Equity:\nnpx hardhat verify --network bnbtestnet ${reserve} ${await OFD.getAddress()}\n`
   );
 };
 export default deploy;

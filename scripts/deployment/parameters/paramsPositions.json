@@ -20,7 +20,7 @@
     "type": "mock",
     "chainName": "BNBTestnet",
     "chainId": 97,
-    "collateralTknAddr": "0x8708eB92a2d2483F4795542d7b3Ebd7909f05702",
+    "collateralTknAddr": "0x55899A4Cd6D255DCcAA84d67E3A08043F2123d7E",
     "minCollateral": 5,
     "initialCollateral": 25,
     "initialLimitOFD": 40000,
