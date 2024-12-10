@@ -54,6 +54,12 @@ describe("OracleFreeDollar", () => {
       let isMinter = await ofd.isMinter(await bridge.getAddress());
       expect(isMinter).to.be.true;
     });
+    it("should revert initialization if non-deployer tries to initialize a minter", async () => {
+      // Connect with a different address (alice) and expect a revert
+      await expect(
+          ofd.connect(alice).initialize(await alice.getAddress(), "Malicious minter")
+      ).to.be.revertedWith("OracleFreeDollar: Only deployer can initialize");
+    });
     it("should revert initialization when there is supply", async () => {
       let amount = floatToDec18(10000);
       await mockXOFD.approve(await bridge.getAddress(), amount);

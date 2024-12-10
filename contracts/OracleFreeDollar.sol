@@ -32,6 +32,11 @@ contract OracleFreeDollar is ERC20PermitLight, IOracleFreeDollar {
     uint256 private minterReserveE6;
 
     /**
+     * @notice The address that deployed this contract. Used for safety for first initializations.
+     */
+    address private immutable _deployer;
+
+    /**
      * @notice Map of minters to approval time stamps. If the time stamp is in the past, the minter contract is allowed
      * to mint OracleFreeDollars.
      */
@@ -64,6 +69,7 @@ contract OracleFreeDollar is ERC20PermitLight, IOracleFreeDollar {
      */
     constructor(uint256 _minApplicationPeriod) ERC20(18) {
         MIN_APPLICATION_PERIOD = _minApplicationPeriod;
+        _deployer = msg.sender;
         reserve = new Equity(this);
     }
 
@@ -76,6 +82,7 @@ contract OracleFreeDollar is ERC20PermitLight, IOracleFreeDollar {
     }
 
     function initialize(address _minter, string calldata _message) external {
+        require(msg.sender == _deployer, "OracleFreeDollar: Only deployer can initialize");
         require(totalSupply() == 0 && reserve.totalSupply() == 0);
         minters[_minter] = block.timestamp;
         emit MinterApplied(_minter, 0, 0, _message);
