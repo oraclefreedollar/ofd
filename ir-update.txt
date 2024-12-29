@@ -18,7 +18,7 @@ timeline:
 ----------
 go-live v2 december 2024
 
-SNAPSHOT OFDPS on 19th
+SNAPSHOT OFDPS on nov 19th 
 ----------------
 "HolderAddress","Balance","PendingBalanceUpdate"
 "0x8181fb4ccedde9e0f08f712cd303c463fe88594d","400.320635907719262536","No"
@@ -89,3 +89,13 @@ SNAPSHOT OFDPS on 19th
 "0x0985cb79ad6e1d1e744f29a1cf6fcb3753065ee5","0.000000000000000001","No"
 "0x0000000040ac064de24cbc1cb9fcbcbc033ee5b6","0.000000000000000001","No"
 "0x0000cafe9fc209e0593cda81d27bde98a65f1070","0.000000000000000001","No"
+
+Addendum:
+the OFDPS used to protect USDT on bridging contract were 
+0x376d0c131e4D48c3a3Dab73Ce28CFdA59130Cb20	628,6330198
+0x72D37E9DAb9EA99c0C114A565e653a5f675353D4	244,9012556
+0x64e65c132bA7Bd52bDc4D9894d33D2fcbAA334A1	200
+
+At the snapshot there were 4471,051234 OPDPS in circulations
+
+
