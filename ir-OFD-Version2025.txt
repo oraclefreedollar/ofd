@@ -1,0 +1,57 @@
+Because of the incident the OFD was redeployed. The old OFD ecosystem was replaced with the new ecosystem. 
+
+MAKE SURE YOU ADD THE NEW CONTRACTS TO THE WALLET. THESE ARE THE NEW CONTRACTS
+
+NEW OFD ECOSYSTEM
+---------------------------------
+
+- OracleFreeDollar: [0xc97c78dbf7D51d50a8e3a423774ad6F921E9b599](https://bscscan.com/address/0xc97c78dbf7D51d50a8e3a423774ad6F921E9b599)
+- Equity: [0x49eA9f8A532f62e0972587704F59ee7364173419](https://bscscan.com/address/0x49eA9f8A532f62e0972587704F59ee7364173419)
+- PositionFactory: [0xeCB9e1fA47490AcA1e7B76Fa1c1B88569f2CfCa1](https://bscscan.com/address/0xeCB9e1fA47490AcA1e7B76Fa1c1B88569f2CfCa1)
+- PositionRoller: [0x3C672bA969D4eD2f9F3F39eeE4Fdfb40fce1c8f9](https://bscscan.com/address/0x3C672bA969D4eD2f9F3F39eeE4Fdfb40fce1c8f9)
+- Savings: [0x9c8A9A2eB148703aF8e737De8A492b3C3A6540E3](https://bscscan.com/address/0x9c8A9A2eB148703aF8e737De8A492b3C3A6540E3)
+- MintingHub: [0x3578dC0e62612d6c6cafec526ff6517c51128AeD](https://bscscan.com/address/0x3578dC0e62612d6c6cafec526ff6517c51128AeD)
+- StablecoinBridge: [0x2A864A8aD758deB139750548f252D07e1cA64E9C](https://bscscan.com/address/0x2A864A8aD758deB139750548f252D07e1cA64E9C)
+
+
+All OFDPS holders that had OFDPS during the snapshot will be airdropped the new OFDPS tokens
+---------------------------------
+
+The order of airdrop will be in the order of investments according OFDPS investments here 
+https://bscscan.com/txs?a=0xeA38b0cD48fA781181FDAa37291e8d6668462261 they will be batched in 4 batches and paid out before jan 15th
+
+airdrops
+---------------------------------
+
+Every OFDSP holder should recieve a multiple of 1.35 x OFDPS of the old tokens in the 2025 Version Token. 
+
+At the snapshot the price of OFDPS was 158 OFD
+
+At the restart of 2025 Version of OFDPS the price will be around 117 in Q1 2025 as soon as all positions have been reopened.
+
+So the OFDPS tokenholders have no price loss.
+
+The only disatvantage from the incident and the restart of the OFDPS Ecosystem is that OFDPS tokenholders have to wait 3 months before they can swap back OFDPS into OFD tokens.
+
+
+
+
+OLD OFD ECOSYSTEM
+---------------------------------
+Oracle Free Dollar
+https://bscscan.com/address/0x55899a4cd6d255dccaa84d67e3a08043f2123d7e
+
+Equity Contract
+ https://bscscan.com/address/0xeA38b0cD48fA781181FDAa37291e8d6668462261
+
+Stable Coin Bridge
+https://bscscan.com/address/0x5330B9275C9094555286998D20c96bc63a9A575f
+
+Minting Hub
+https://bscscan.com/address/0xFe00054AF44E24f0B4bd49b1A2d2984C4264aabE
+
+USDT on BNB
+https://bscscan.com/address/0x55d398326f99059ff775485246999027b3197955
+
+
+
